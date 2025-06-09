@@ -1,0 +1,56 @@
+# Entornos virtuales
+venv/
+.env/
+.env.local
+.env.development
+.env.production
+
+# Archivos de entorno
+.env
+.env/*
+
+# Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+db.sqlite3
+/media
+/staticfiles
+
+# IDE/Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Archivos del sistema
+Thumbs.db
+
+# Archivos de desarrollo local
+local_settings.py
+
+# Archivos de collectstatic (se generan automáticamente)
+/staticfiles/*
+!/staticfiles/.gitkeep
+
+# Archivos de base de datos de desarrollo
+*.sqlite3
+*.db
+
+# Archivos de migraciones (opcional, algunos prefieren versionarlos)
+# */migrations/*
+# !*/migrations/__init__.py
+
+# Archivos de coverage
+.coverage
+htmlcov/
+
+# Archivos de pytest
+.pytest_cache/
+
+# Archivos de package
+*.egg-info/
+dist/
+build/

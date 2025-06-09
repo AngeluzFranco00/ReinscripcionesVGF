@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Comprobante de Inscripción</title>
+    <style>
+        @page { size: A4; margin: 1.5cm; }
+        body { font-family: Arial, sans-serif; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .logo { width: 150px; }
+        .title { font-size: 18px; font-weight: bold; }
+        .ficha-info { margin-top: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">INSTITUTO TECNOLÓGICO DE MÉXICO</div>
+        <div class="subtitle">COMPROBANTE DE INSCRIPCIÓN</div>
+    </div>
+
+    <div class="ficha-info">
+        <table>
+            <tr>
+                <th>Número de Control:</th>
+                <td>{{ ficha.numero_control }}</td>
+            </tr>
+            <tr>
+                <th>Alumno:</th>
+                <td>{{ ficha.nombres }} {{ ficha.apellido_paterno }} {{ ficha.apellido_materno }}</td>
+            </tr>
+            <tr>
+                <th>Grupo Anterior:</th>
+                <td>{{ ficha.grupo_anterior }}</td>
+            </tr>
+            <tr>
+                <th>Semestre Anterior:</th>
+                <td>{{ ficha.semestre_anterior }}</td>
+            </tr>
+            <tr>
+                <th>Especialidad:</th>
+                <td>{{ ficha.nombre_especialidad }}</td>
+            </tr>
+            <tr>
+                <th>Taller:</th>
+                <td>{{ ficha.nombre_taller }}</td>
+            </tr>
+            <tr>
+                <th>Fecha de Solicitud:</th>
+                <td>{{ ficha.fecha_solicitud }}</td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
