@@ -75,7 +75,7 @@ def especialidades_disponibles(request):
             especialidades_list.append(esp)
         return JsonResponse(especialidades_list, safe=False)
 
-
+@csrf_exempt
 @transaction.atomic
 def registrar_inscripcion(request):
     if request.method == 'POST':
