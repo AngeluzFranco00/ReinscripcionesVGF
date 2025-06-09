@@ -18,7 +18,7 @@ from reportlab.lib.units import inch
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
 from django.views.decorators.http import require_http_methods
         
-@csrf_exempt
+
 def buscar_alumno(request, numero_control):
     if request.method == 'GET':
         try:
@@ -52,7 +52,6 @@ def buscar_alumno(request, numero_control):
         return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
-@csrf_exempt
 def talleres_disponibles(request):
     if request.method == 'GET':
         talleres = Taller.objects.filter(cantidad__lt=30).values('id_taller', 'nombre', 'cantidad')
@@ -64,7 +63,6 @@ def talleres_disponibles(request):
         return JsonResponse(talleres_list, safe=False)
 
 
-@csrf_exempt
 def especialidades_disponibles(request):
     if request.method == 'GET':
         especialidades = Especialidad.objects.filter(cantidad__lt=40).values(
@@ -78,7 +76,6 @@ def especialidades_disponibles(request):
         return JsonResponse(especialidades_list, safe=False)
 
 
-@csrf_exempt
 @transaction.atomic
 def registrar_inscripcion(request):
     if request.method == 'POST':
@@ -173,7 +170,6 @@ def registrar_inscripcion(request):
         return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
-@csrf_exempt
 def consultar_ficha(request, numero_control):
     if request.method == 'GET':
         try:
@@ -210,7 +206,6 @@ def consultar_ficha(request, numero_control):
         return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
-@csrf_exempt
 @require_http_methods(["GET"])
 def generar_solicitud_pdf(request, numero_control):
     try:
