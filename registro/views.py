@@ -17,6 +17,7 @@ from reportlab.platypus import (
 from reportlab.lib.units import inch
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
 from django.views.decorators.http import require_http_methods
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
         
 
 def buscar_alumno(request, numero_control):
@@ -202,6 +203,106 @@ def consultar_ficha(request, numero_control):
             return JsonResponse({'error': 'Alumno no encontrado'}, status=404)
         except FichaInscripcion.DoesNotExist:
             return JsonResponse({'error': 'El alumno no tiene ficha de inscripción'}, status=404)
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+
+def consultar_todas_fichas(request):
+    if request.method == 'GET':
+        try:
+            page = request.GET.get('page', 1)
+            per_page = int(request.GET.get('per_page', 20))
+            
+            search = request.GET.get('search', '')
+            grupo = request.GET.get('grupo', '')
+            semestre = request.GET.get('semestre', '')
+            especialidad = request.GET.get('especialidad', '')
+            
+            fichas_query = FichaInscripcion.objects.select_related(
+                'alumno', 'especialidad', 'taller'
+            ).all()
+            
+            if search:
+                fichas_query = fichas_query.filter(
+                    FichaInscripcion(alumno__numero_control__icontains=search) |
+                    FichaInscripcion(alumno__nombres__icontains=search) |
+                    FichaInscripcion(alumno__apellido_paterno__icontains=search) |
+                    FichaInscripcion(alumno__apellido_materno__icontains=search)
+                )
+            
+            if grupo:
+                fichas_query = fichas_query.filter(grupo_inscripcion__icontains=grupo)
+            
+            if semestre:
+                fichas_query = fichas_query.filter(semestre_inscripcion=semestre)
+            
+            if especialidad:
+                fichas_query = fichas_query.filter(especialidad__codigo=especialidad)
+            
+            fichas_query = fichas_query.order_by('-fecha_solicitud')
+            
+            paginator = Paginator(fichas_query, per_page)
+            
+            try:
+                fichas_page = paginator.page(page)
+            except PageNotAnInteger:
+                fichas_page = paginator.page(1)
+            except EmptyPage:
+                fichas_page = paginator.page(paginator.num_pages)
+            
+            fichas_data = []
+            for ficha in fichas_page:
+                ficha_data = {
+                    'id_inscripcion': ficha.id_inscripcion,
+                    'alumno': {
+                        'numero_control': ficha.alumno.numero_control,
+                        'nombre_completo': f"{ficha.alumno.nombres} {ficha.alumno.apellido_paterno} {ficha.alumno.apellido_materno}",
+                        'grupo_anterior': ficha.alumno.grupo_anterior,
+                        'semestre_anterior': ficha.alumno.semestre_anterior
+                    },
+                    'inscripcion': {
+                        'grupo_inscripcion': ficha.grupo_inscripcion,
+                        'semestre_inscripcion': ficha.semestre_inscripcion,
+                        'especialidad': {
+                            'nombre': ficha.especialidad.nombre if ficha.especialidad else None,
+                            'codigo': ficha.especialidad.codigo if ficha.especialidad else None
+                        },
+                        'taller': ficha.taller.nombre if ficha.taller else None,
+                        'fecha_solicitud': ficha.fecha_solicitud
+                    }
+                }
+                fichas_data.append(ficha_data)
+            
+            pagination_info = {
+                'current_page': fichas_page.number,
+                'total_pages': paginator.num_pages,
+                'total_records': paginator.count,
+                'per_page': per_page,
+                'has_next': fichas_page.has_next(),
+                'has_previous': fichas_page.has_previous(),
+                'next_page': fichas_page.next_page_number() if fichas_page.has_next() else None,
+                'previous_page': fichas_page.previous_page_number() if fichas_page.has_previous() else None
+            }
+            
+            response_data = {
+                'fichas': fichas_data,
+                'pagination': pagination_info,
+                'filters_applied': {
+                    'search': search,
+                    'grupo': grupo,
+                    'semestre': semestre,
+                    'especialidad': especialidad
+                }
+            }
+            
+            return JsonResponse(response_data, status=200)
+            
+        except Exception as e:
+            return JsonResponse({
+                'error': 'Error interno del servidor',
+                'detail': str(e)
+            }, status=500)
+    
     else:
         return JsonResponse({'error': 'Método no permitido'}, status=405)
 
