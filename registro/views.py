@@ -206,7 +206,7 @@ def consultar_ficha(request, numero_control):
     else:
         return JsonResponse({'error': 'Método no permitido'}, status=405)
 
-
+@csrf_exempt
 def consultar_todas_fichas(request):
     if request.method == 'GET':
         try:
